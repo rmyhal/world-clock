@@ -5,7 +5,7 @@ import com.rusmyhal.worldclock.model.data.remote.entity.TimeZone
 import com.rusmyhal.worldclock.model.system.SchedulersProvider
 import io.reactivex.Single
 
-class TimeZoneRepository(private val api: ApiService, private val schedulers: SchedulersProvider) {
+class TimeZonesRepository(private val api: ApiService, private val schedulers: SchedulersProvider) {
 
     fun fetchTimeZones(): Single<List<TimeZone>> {
         return api.getTimeZones()

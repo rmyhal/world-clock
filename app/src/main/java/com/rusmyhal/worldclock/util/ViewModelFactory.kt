@@ -1,4 +1,4 @@
-package com.rusmyhal.worldclock.ui
+package com.rusmyhal.worldclock.util
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -22,8 +22,10 @@ class ViewModelFactory private constructor(
         private var INSTANCE: ViewModelFactory? = null
 
         fun getInstance() =
-            INSTANCE ?: synchronized(ViewModelFactory::class.java) {
-                INSTANCE ?: ViewModelFactory(TimeZonesRepository.getInstance()).also { INSTANCE = it }
+            INSTANCE
+                ?: synchronized(ViewModelFactory::class.java) {
+                INSTANCE
+                    ?: ViewModelFactory(TimeZonesRepository.getInstance()).also { INSTANCE = it }
             }
     }
 }

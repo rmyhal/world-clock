@@ -3,7 +3,6 @@ package com.rusmyhal.worldclock.util
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
-import com.rusmyhal.worldclock.ui.ViewModelFactory
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 

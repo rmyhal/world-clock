@@ -12,6 +12,9 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "TIME_ZONE_ENDPOINT", '"https://api.timezonedb.com/"')
+        buildConfigField("String", "TIME_ZONE_API_KEY", '"SJ8E7YNNLWBK"')
     }
     buildTypes {
         release {
@@ -34,6 +37,7 @@ dependencies {
     // rxJava
     implementation "io.reactivex.rxjava2:rxjava:2.2.6"
     implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
 
     // retrofit
     implementation "com.squareup.retrofit2:retrofit:2.5.0"

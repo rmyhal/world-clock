@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="clockStrokeWidth">5dp</dimen>
+    <dimen name="clockNumbersSize">24sp</dimen>
+    <dimen name="clockNumbersPadding">12dp</dimen>
+    <dimen name="clockCenterRadius">8dp</dimen>
+</resources>

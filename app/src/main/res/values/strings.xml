@@ -6,5 +6,6 @@
     <!--region time zones screen-->
     <string name="time_zones_title">Time Zone</string>
     <string name="time_zones_retry">Retry</string>
+    <string name="time_zones_clock_color_title">Clock color</string>
     <!--endregion-->
 </resources>

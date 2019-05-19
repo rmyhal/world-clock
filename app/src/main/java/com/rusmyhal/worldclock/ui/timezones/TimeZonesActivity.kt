@@ -44,7 +44,11 @@ class TimeZonesActivity : AppCompatActivity() {
 
         snackbarMessage.observe(this@TimeZonesActivity, Observer { message ->
             message.getContentIfNotHandled()?.let {
-                Snackbar.make(content, it, Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(content, getString(it), Snackbar.LENGTH_SHORT)
+                    .setAction(R.string.time_zones_retry) {
+                        viewModel.fetchTimeZones()
+                    }
+                    .show()
             }
         })
     }

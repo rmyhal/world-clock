@@ -3,6 +3,7 @@ package com.rusmyhal.worldclock.ui.timezones
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.rusmyhal.worldclock.R
 import com.rusmyhal.worldclock.model.data.remote.entity.TimeZone
 import com.rusmyhal.worldclock.model.repository.TimeZonesRepository
 import com.rusmyhal.worldclock.util.Event
@@ -19,8 +20,8 @@ class TimeZonesViewModel(private val timeZonesRepository: TimeZonesRepository) :
     val timeZonesList: LiveData<List<String>>
         get() = _timeZonesList
 
-    private val _snackbarMessage = MutableLiveData<Event<String>>()
-    val snackbarMessage: LiveData<Event<String>>
+    private val _snackbarMessage = MutableLiveData<Event<Int>>()
+    val snackbarMessage: LiveData<Event<Int>>
         get() = _snackbarMessage
 
     private val _selectedTimeZone = MutableLiveData<TimeZone>()
@@ -38,7 +39,7 @@ class TimeZonesViewModel(private val timeZonesRepository: TimeZonesRepository) :
                     timeZonesResponse.value = response
                 }
             }, { error ->
-                _snackbarMessage.value = Event("Something went wrong, try again")
+                _snackbarMessage.value = Event(R.string.error_api)
                 error.printStackTrace()
             })
             .addTo(compositeDisposable)

@@ -1,5 +1,6 @@
 package com.rusmyhal.worldclock.ui.timezones
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -20,10 +21,22 @@ class TimeZonesActivity : AppCompatActivity() {
         ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item)
     }
 
+    private val clockColorAdapter by lazy {
+        ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item)
+    }
+
+    private val colors by lazy {
+        resources.getStringArray(R.array.clockColors)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_time_zones)
+
         timeZonesSpinner.adapter = timeZonesAdapter
+
+        clockColorAdapter.addAll(colors.toList())
+        clockColorSpinner.adapter = clockColorAdapter
 
         setupListeners()
         initObservers()
@@ -68,6 +81,24 @@ class TimeZonesActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>?) { /* ignore */
             }
         }
+
+        clockColorSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long) {
+                updateClockColor(colors[position].toLowerCase())
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) { /* ignore */
+            }
+
+        }
+    }
+
+    private fun updateClockColor(color: String) {
+        analogClock.clockColor = Color.parseColor(color)
     }
 
     companion object {

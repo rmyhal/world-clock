@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="clockColors">
+        <item>Black</item>
+        <item>Blue</item>
+        <item>Green</item>
+        <item>Red</item>
+    </array>
+</resources>

@@ -51,12 +51,12 @@ class TimeZonesActivity : AppCompatActivity() {
         })
 
         selectedTimeZone.observe(this@TimeZonesActivity, Observer { timeZone ->
-            Log.d(TAG, "initObservers() $timeZone")
+            analogClock.setTime(timeZone.zoneName)
         })
 
         snackbarMessage.observe(this@TimeZonesActivity, Observer { message ->
             message.getContentIfNotHandled()?.let {
-                Snackbar.make(content, getString(it), Snackbar.LENGTH_SHORT)
+                Snackbar.make(content, getString(it), Snackbar.LENGTH_LONG)
                     .setAction(R.string.time_zones_retry) {
                         viewModel.fetchTimeZones()
                     }

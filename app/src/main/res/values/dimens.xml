@@ -3,5 +3,10 @@
     <dimen name="clockStrokeWidth">5dp</dimen>
     <dimen name="clockNumbersSize">24sp</dimen>
     <dimen name="clockNumbersPadding">12dp</dimen>
-    <dimen name="clockCenterRadius">8dp</dimen>
+    <dimen name="clockCenterRadius">14dp</dimen>
+    <dimen name="clockHoursHandWidth">8dp</dimen>
+    <dimen name="clockMinutesHandWidth">10dp</dimen>
+    <dimen name="clockSecondsHandWidth">2dp</dimen>
+    <dimen name="clockNumeralPadding">20dp</dimen>
+    <dimen name="clockPadding">5dp</dimen>
 </resources>

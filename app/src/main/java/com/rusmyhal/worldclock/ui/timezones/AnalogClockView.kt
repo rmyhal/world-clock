@@ -5,6 +5,7 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import com.rusmyhal.worldclock.R
+import java.util.*
 
 
 class AnalogClockView @JvmOverloads constructor(
@@ -12,26 +13,24 @@ class AnalogClockView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0) : View(context, attrs, defStyleAttr) {
 
-    var clockColor: Int = Color.BLACK
-        set(value) {
-            field = value
-            updateClockColor()
-            invalidate()
-        }
-
     private val dialPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     private val clockStrokeWidth = resources.getDimension(R.dimen.clockStrokeWidth)
     private val clockNumbersSize = resources.getDimension(R.dimen.clockNumbersSize)
     private val clockCenterRadius = resources.getDimension(R.dimen.clockCenterRadius)
-    private val textRect = Rect()
 
-    private val numbersList = arrayOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
+    private val hoursHandWidth = resources.getDimension(R.dimen.clockHoursHandWidth)
+    private val minutesHandWidth = resources.getDimension(R.dimen.clockMinutesHandWidth)
+    private val secondsHandWidth = resources.getDimension(R.dimen.clockSecondsHandWidth)
+    private var numeralPadding = resources.getDimension(R.dimen.clockNumeralPadding)
+    private var clockPadding = 0f
+
+    private val numeralRect = Rect()
+
+    private val numbersList = arrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
 
     private var clockRadius = 0f
-    private var padding = 0f
-    private var numeralPadding = 0f
 
     private var handTruncation = 0f
     private var hourHandTruncation = 0f
@@ -39,7 +38,25 @@ class AnalogClockView @JvmOverloads constructor(
     private var centerX = 0f
     private var centerY = 0f
 
-    private var isInit = false
+    private var isInitialized = false
+
+    private var timeZone: String? = null
+
+    private val updateRunnable = object : Runnable {
+        override fun run() {
+            invalidate()
+            postDelayed(this, 1000)
+        }
+    }
+
+    private lateinit var calendar: Calendar
+
+    var clockColor: Int = Color.BLACK
+        set(value) {
+            field = value
+            updateClockColor()
+            invalidate()
+        }
 
     init {
         setLayerType(LAYER_TYPE_SOFTWARE, null)
@@ -64,35 +81,95 @@ class AnalogClockView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
-        if (!isInit) {
-            centerX = width / 2f
-            centerY = height / 2f
-
-            padding = numeralPadding + 50 // spacing from the circle border
-
-            val min = Math.min(width, height)
-            clockRadius = min / 2f - padding
-
-            handTruncation = min / 20f
-            hourHandTruncation = min / 17f
-
-            isInit = true
+        if (!isInitialized) {
+            calculateValues()
+            isInitialized = true
         }
 
-        drawCircle(canvas)
-        drawCenter(canvas)
-
-        for (hour in numbersList) {
-            textPaint.getTextBounds(hour, 0, hour.length, textRect)
-
-            // fund the circle-wise
-            val angle: Double = Math.PI / 6 * (hour.toInt() - 3)
-            val textX = centerX + Math.cos(angle) * clockRadius - textRect.width() / 2
-            val textY = centerY + Math.sin(angle) * clockRadius + textRect.height() / 2
-            canvas.drawText(hour, textX.toFloat(), textY.toFloat(), textPaint)
+        if (timeZone != null) {
+            drawCircle(canvas)
+            drawCenter(canvas)
+            drawNumerals(canvas)
+            drawHands(canvas)
         }
     }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        removeCallbacks(updateRunnable)
+    }
+
+    fun setTime(timeZone: String) {
+        this.timeZone = timeZone
+
+        post(updateRunnable)
+    }
+
+    private fun calculateValues() {
+        centerX = width / 2f
+        centerY = height / 2f
+
+        clockPadding += numeralPadding // clockPadding from the circle border
+
+        val minSideSize = Math.min(width, height)
+        clockRadius = minSideSize / 2f - clockPadding
+
+        handTruncation = clockRadius * HAND_TRUNCATION
+        hourHandTruncation = clockRadius * HOUR_HAND_TRUNCATION
+    }
+
+    private fun drawNumerals(canvas: Canvas) {
+        for (hour in numbersList) {
+            val tempString = hour.toString()
+            textPaint.getTextBounds(tempString, 0, tempString.length, numeralRect)
+
+            val angle: Double = Math.PI / 6 * (hour - 3)
+            val textX = centerX + Math.cos(angle) * clockRadius - numeralRect.width() / 2
+            val textY = centerY + Math.sin(angle) * clockRadius + numeralRect.height() / 2
+            canvas.drawText(tempString, textX.toFloat(), textY.toFloat(), textPaint)
+        }
+    }
+
+    private fun drawHands(canvas: Canvas) {
+        dialPaint.apply {
+            reset()
+            color = clockColor
+            isAntiAlias = true
+            style = Paint.Style.STROKE
+        }
+
+        calendar = Calendar.getInstance(TimeZone.getTimeZone(timeZone))
+        var hours = calendar.get(Calendar.HOUR_OF_DAY)
+        hours = if (hours > 12) hours - 12 else hours
+        val minutes = calendar.get(Calendar.MINUTE)
+        val seconds = calendar.get(Calendar.SECOND)
+
+        val hoursToDraw = (hours + (minutes / 60)) * 5f
+
+        drawHand(canvas, hoursToDraw, HandType.HOUR)
+        drawHand(canvas, minutes.toFloat(), HandType.MINUTE)
+        drawHand(canvas, seconds.toFloat(), HandType.SECOND)
+    }
+
+    private fun drawHand(canvas: Canvas, amount: Float, handType: HandType) {
+        val angle = Math.PI * amount / 30 - Math.PI / 2
+
+        dialPaint.strokeWidth = when (handType) {
+            HandType.HOUR -> hoursHandWidth
+            HandType.MINUTE -> minutesHandWidth
+            HandType.SECOND -> secondsHandWidth
+        }
+
+        val handRadius = if (handType == HandType.HOUR) {
+            clockRadius - handTruncation - hourHandTruncation
+        } else {
+            clockRadius - handTruncation
+        }
+        val lineStopX = centerX + Math.cos(angle) * handRadius
+        val lineStopY = centerY + Math.sin(angle) * handRadius
+        canvas.drawLine(centerX, centerY, lineStopX.toFloat(), lineStopY.toFloat(), dialPaint)
+    }
+
 
     private fun drawCircle(canvas: Canvas) {
         dialPaint.apply {
@@ -102,7 +179,7 @@ class AnalogClockView @JvmOverloads constructor(
             isAntiAlias = true
             style = Paint.Style.STROKE
         }
-        canvas.drawCircle(centerX, centerY, clockRadius + padding - 10, dialPaint)
+        canvas.drawCircle(centerX, centerY, clockRadius + clockPadding - clockStrokeWidth, dialPaint)
     }
 
     private fun drawCenter(canvas: Canvas) {
@@ -118,5 +195,17 @@ class AnalogClockView @JvmOverloads constructor(
     private fun updateClockColor() {
         dialPaint.color = clockColor
         textPaint.color = clockColor
+    }
+
+    private enum class HandType {
+        HOUR,
+        MINUTE,
+        SECOND
+    }
+
+    companion object {
+
+        private const val HAND_TRUNCATION = 0.1f
+        private const val HOUR_HAND_TRUNCATION = 0.35f
     }
 }

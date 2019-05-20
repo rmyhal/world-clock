@@ -13,7 +13,6 @@ import io.reactivex.disposables.CompositeDisposable
 class TimeZonesViewModel(private val timeZonesRepository: TimeZonesRepository) : ViewModel() {
 
     private val compositeDisposable = CompositeDisposable()
-
     private val timeZonesResponse = MutableLiveData<List<TimeZone>>()
 
     private val _timeZonesList = MutableLiveData<List<String>>().apply { value = emptyList() }
@@ -41,8 +40,9 @@ class TimeZonesViewModel(private val timeZonesRepository: TimeZonesRepository) :
             .doOnSubscribe { _progress.value = true }
             .doFinally { _progress.value = false }
             .subscribe({ response ->
-                _timeZonesList.value = response.map { it.zoneName }.also {
-                    timeZonesResponse.value = response
+                response.sortedBy { it.zoneName }.also { sortedZones ->
+                    _timeZonesList.value = sortedZones.map { it.zoneName }
+                    timeZonesResponse.value = sortedZones
                 }
             }, { error ->
                 _snackbarMessage.value = Event(R.string.error_api)
@@ -53,9 +53,5 @@ class TimeZonesViewModel(private val timeZonesRepository: TimeZonesRepository) :
 
     fun onTimeZoneSelected(position: Int) {
         _selectedTimeZone.value = timeZonesResponse.value?.get(position)
-    }
-
-    companion object {
-        const val TAG = "TimeZonesViewModel"
     }
 }

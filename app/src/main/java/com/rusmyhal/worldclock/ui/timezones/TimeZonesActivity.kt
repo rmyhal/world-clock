@@ -2,7 +2,6 @@ package com.rusmyhal.worldclock.ui.timezones
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -64,6 +63,9 @@ class TimeZonesActivity : AppCompatActivity() {
                     .show()
             }
         })
+        progress.observe(this@TimeZonesActivity, Observer { progress ->
+            if (progress) progressBar.show() else progressBar.hide()
+        })
     }
 
     private fun setupListeners() {
@@ -99,10 +101,5 @@ class TimeZonesActivity : AppCompatActivity() {
 
     private fun updateClockColor(color: String) {
         analogClock.clockColor = Color.parseColor(color)
-    }
-
-    companion object {
-
-        const val TAG = "TimeZonesActivity"
     }
 }

@@ -28,12 +28,18 @@ class TimeZonesViewModel(private val timeZonesRepository: TimeZonesRepository) :
     val selectedTimeZone: LiveData<TimeZone>
         get() = _selectedTimeZone
 
+    private val _progress = MutableLiveData<Boolean>()
+    val progress: LiveData<Boolean>
+        get() = _progress
+
     override fun onCleared() {
         compositeDisposable.clear()
     }
 
     fun fetchTimeZones() {
         timeZonesRepository.fetchTimeZones()
+            .doOnSubscribe { _progress.value = true }
+            .doFinally { _progress.value = false }
             .subscribe({ response ->
                 _timeZonesList.value = response.map { it.zoneName }.also {
                     timeZonesResponse.value = response

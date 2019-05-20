@@ -59,8 +59,6 @@ class AnalogClockView @JvmOverloads constructor(
         }
 
     init {
-        setLayerType(LAYER_TYPE_SOFTWARE, null)
-
         context.theme.obtainStyledAttributes(attrs, R.styleable.AnalogClockView, 0, 0).also {
             clockColor = it.getColor(R.styleable.AnalogClockView_color, 0)
             it.recycle()
